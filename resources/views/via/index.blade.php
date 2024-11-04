@@ -5,148 +5,170 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Tải lên File</title>
+    <style>
+        /* CSS cho cắt ngắn nội dung và thêm dấu "..." */
+        .truncate {
+            max-width: 200px; /* Chiều rộng tối đa của cột */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
 </head>
 <body>
+    {{-- @if(session('data'))
+        @dd(session('data'))
+    @endif --}}
     <div class="container mt-5">
-        <h2 class="text-center">Tải lên File</h2>
+       <div class="row">
+        <div class="col-md-6">
+            <h2 class="text-center"><a href="{{route('home')}}"> Tải lên File txt </a></h2>
 
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-        <form action="{{ route('file.upload.txt') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <div class="form-group">
-                <label for="fileUpload">Tải lên file tại đây</label>
-                <input type="file" class="form-control-file" id="fileUpload" name="file" required>
-            </div>
-
-            <div class="container mt-5">
-                <div class="row">
-                    {{-- <!-- Dropdown đầu tiên -->
-                    <div class="col-md-4">
+            <form action="{{ route('file.upload.txt') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="container row">
+                    <div class="form-group col-md-3">
+                        <label for="fileUpload">Tải file</label>
+                        <input type="file" class="form-control-file" id="fileUpload" name="file" required>
+                    </div>
+                    <div class="form-group col-md-3">
                         <div class="form-group">
-                            <select class="form-control" id="category0" name="categories[]">
-                                <option value="0">UID</option>
-                                <option value="1">Password</option>
-                                <option value="2">2FA Key</option>
+                            <label for="fileSelect">Chọn mẫu</label>
+                            <select class="form-control" id="fileSelect" name="keys" required>
+                                <option value="" disabled selected>-Chọn-</option>
+                                <option value="1">'uid','name','pass','token','email'</option>
+                                <option value="2">'uid','pass','2fa','cookies','email'</option>
+                                <option value="3">'uid','pass','cookies'</option>
+                                <option value="4">'uid','pass','2fa','birthday','email','email_password','cookies'</option>
+                                <!-- Thêm các tùy chọn file khác nếu cần -->
                             </select>
                         </div>
                     </div>
-
-                    <!-- Nút thêm tùy chọn nhập -->
-                    <div class="col-md-4">
-                        <button type="button" class="btn btn-secondary btn-block" onclick="addDropdown()">Thêm tùy chọn nhập</button>
-                    </div> --}}
-
-                    <!-- Nút Gửi -->
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary btn-block">Tải lên</button>
+                    <div class="form-group col-md-3">
+                        <label for="fileUpload">Tên nguồn</label>
+                        <input type="text" class="form-control-file" id="source_name" name="source_name" required>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="fileUpload">Link nguồn</label>
+                        <input type="text" class="form-control-file" id="source_link" name="source_link" required>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="fileUpload">Giá</label>
+                        <input type="text" class="form-control-file" id="price" name="price" required>
                     </div>
                 </div>
-            </div>
+                <div class="container mt-5">
+                    <div class="row">
+                        <!-- Nút Gửi -->
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary btn-block">Tải lên</button>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{route('import.txt')}}">Nhập vào</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <h2 class="text-center">Tải lên File xlxs</h2>
 
-        </form>
-
-        <div class="table-responsive mt-4">
-            <table class="table table-bordered table-striped" id="sortableTable">
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col" onclick="sortTable(0)">UID</th>
-                        <th scope="col" onclick="sortTable(1)">Họ tên</th>
-                        <th scope="col" onclick="sortTable(2)">Pass</th>
-                        <th scope="col" onclick="sortTable(3)">Token</th>
-                        <th scope="col" onclick="sortTable(4)">Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{-- @dd($data) --}}
-                    @if(isset($data))
-                        @foreach($data as $info)
-                            <tr>
-                                <td>{{ $info[0] }}</td>
-                                <td>{{ $info[1] }}</td>
-                                <td>{{ $info[2] }}</td>
-                                <td>{{ $info[3] }}</td>
-                                <td>{{ $info[4] }}</td>
-                            </tr>
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
                         @endforeach
-                    @else
+                    </ul>
+                </div>
+            @endif
+
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <form action="{{ route('file.upload.txt') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="form-group">
+                    <label for="fileUpload">Tải lên file tại đây</label>
+                    <input type="file" class="form-control-file" id="fileUpload" name="file" required>
+                </div>
+
+                <div class="container mt-5">
+                    <div class="row">
+                        <!-- Nút Gửi -->
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary btn-block">Tải lên</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+       </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="table-responsive mt-5">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
                         <tr>
-                            <td colspan="5" class="text-center">No data available</td>
+                            <th scope="col" onclick="sortTable(0)">ID</th>
+                            <th scope="col" onclick="sortTable(0)">UID</th>
+                            <th scope="col" onclick="sortTable(1)">Họ tên</th>
+                            <th scope="col" onclick="sortTable(2)">Pass</th>
+                            <th scope="col" onclick="sortTable(3)">Token</th>
+                            <th scope="col" onclick="sortTable(4)">Cookie</th>
+                            <th scope="col" onclick="sortTable(5)">Email</th>
                         </tr>
-                    @endif
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {{-- @dd($data) --}}
+                        @if(isset($data))
+                            @foreach($data as $info)
+                                <tr>
+                                    @if(isset($info['id']))
+                                        <td>{{ $info['id'] }}</td>
+                                    @else
+                                        <td>-</td>
+                                    @endif
+                                    {{-- $keys = ['uid', 'name', 'pass', 'token', 'email']; --}}
+                                    <td class="truncate">{{ $info['uid']  }}</td>
+                                    <td class="truncate">{{ $info['name'] ?? ''}}</td>
+                                    <td class="truncate">{{ $info['pass'] ?? ''}}</td>
+                                    <td class="truncate">{{ $info['token'] ?? ''}}</td>
+                                    <td class="truncate">{{ $info['cookie'] ?? ''}}</td>
+                                    <td class="truncate">{{ $info['email'] ?? ''}}</td>
+                                </tr>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td colspan="5" class="text-center">No data available</td>
+                            </tr>
+                        @endif
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <script>
-        // Hàm thêm dropdown
-        let dropdownCount = 1;
-
-        function addDropdown() {
-            if (dropdownCount >= 10) {
-                alert("Bạn chỉ có thể thêm tối đa 10 tùy chọn nhập.");
-                return;
-            }
-
-            const container = document.getElementById("dropdownContainer");
-
-            const newDropdown = document.createElement("div");
-            newDropdown.classList.add("form-group");
-            newDropdown.innerHTML = `
-                <label for="category${dropdownCount}">Chọn danh mục</label>
-                <select class="form-control" id="category${dropdownCount}" name="categories[]">
-                    <option value="0">UID</option>
-                    <option value="1">Password</option>
-                    <option value="2">2FA Key</option>
-                </select>
-            `;
-
-            container.appendChild(newDropdown);
-            dropdownCount++;
-        }
-
-        // Hàm sắp xếp bảng
-        function sortTable(columnIndex) {
-            const table = document.getElementById("sortableTable");
-            const tbody = table.tBodies[0];
-            const rows = Array.from(tbody.querySelectorAll("tr"));
-            const isAscending = table.getAttribute("data-sort-dir") !== "asc";
-            table.setAttribute("data-sort-dir", isAscending ? "asc" : "desc");
-
-            // Sắp xếp hàng
-            rows.sort((rowA, rowB) => {
-                const cellA = rowA.cells[columnIndex].innerText.trim();
-                const cellB = rowB.cells[columnIndex].innerText.trim();
-
-                if (!isNaN(cellA) && !isNaN(cellB)) {
-                    return isAscending ? cellA - cellB : cellB - cellA;
-                }
-                return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
-            });
-
-            // Cập nhật bảng
-            rows.forEach(row => tbody.appendChild(row));
-        }
-    </script>
-
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Via;
 use App\Imports\ViasImport;
 use App\Services\ExplodeService;
+use Illuminate\Http\Session;
 
 class ViaController extends Controller
 {
@@ -20,7 +21,7 @@ class ViaController extends Controller
      */
     public function index()
     {
-        $data = Via::all();
+        $data = Via::orderBy('id', 'desc')->take(50)->get();
         return view('via.index',compact('data'));
     }
 
@@ -30,14 +31,45 @@ class ViaController extends Controller
     public function import_txt(Request $request)
     {
         $raw = file_get_contents($request->file);
-        $data = $this->explodeService->clearOrderName($raw);
+        switch ($request->keys) {
+            case 1:
+                $key = $keys= array('uid','name','pass','token','email');
+                break;
+
+            case 2:
+                $key = $keys= array('uid','pass','2fa','cookie','email');
+                break;
+
+            case 3:
+                $key = $keys= array('uid','pass','cookie');
+                break;
+
+            case 4:
+                $key = $keys= array('uid','pass','2fa','birthday','email','email_password','cookie');
+                break;
+
+            default:
+                $key = null; // Hoặc giá trị mặc định khác nếu cần
+                break;
+        }
+
+        $data = $this->explodeService->clearOrderName($raw,$keys);
+
+        // dd($data);
+        session()->put('data', $data);
+
         return view('via.index',compact('data'));
     }
 
     public function save_from_txt(Request $request)
     {
-        $save_data = Via::created($request->all());
-        $data = Via::all();
+        $data = session('data');
+        collect($data)->each(function ($info) {
+            Via::create($info); // Sử dụng create() để thêm dữ liệu
+        });
+        session()->flush();
+        $data = Via::orderBy('id', 'desc')->take(50)->get();
+
         return view('via.index',compact('data'));
     }
 
