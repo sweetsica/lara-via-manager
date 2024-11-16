@@ -29,8 +29,10 @@ return new class extends Migration
             $table->string('groups')->nullable();
             $table->string('year')->nullable();
             $table->string('price')->nullable();
+            $table->string('order_code')->nullable();
             $table->string('source_name')->nullable();
             $table->string('source_link')->nullable();
+            $table->string('birthday')->nullable();
             $table->timestamps();
         });
     }

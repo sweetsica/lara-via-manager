@@ -22,7 +22,8 @@ class ViaController extends Controller
     public function index()
     {
         $data = Via::orderBy('id', 'desc')->take(50)->get();
-        return view('via.index',compact('data'));
+        // return view('via.index',compact('data'));
+        return view('via.dashboard',compact('data'));
     }
 
     /**
@@ -33,27 +34,35 @@ class ViaController extends Controller
         $raw = file_get_contents($request->file);
         switch ($request->keys) {
             case 1:
-                $key = $keys= array('uid','name','pass','token','email');
+                $keys= array('uid','name','pass','token','email');
                 break;
 
             case 2:
-                $key = $keys= array('uid','pass','2fa','cookie','email');
+                $keys= array('uid','pass','2fa','cookie','email');
                 break;
 
             case 3:
-                $key = $keys= array('uid','pass','cookie');
+                $keys= array('uid','pass','cookie');
                 break;
 
             case 4:
-                $key = $keys= array('uid','pass','2fa','birthday','email','email_password','cookie');
+                $keys= array('uid','pass','2fa','birthday','email','email_password','cookie');
+                break;
+
+            case 5:
+                $keys= array('uid','pass','2fa','email','cookie');
+                break;
+
+            case 6:
+                $keys= array('uid','pass');
                 break;
 
             default:
                 $key = null; // Hoặc giá trị mặc định khác nếu cần
                 break;
         }
-
-        $data = $this->explodeService->clearOrderName($raw,$keys);
+        $order_info=array($request->source_name,$request->source_link,$request->price);
+        $data = $this->explodeService->clearOrderName($raw,$keys,$order_info);
 
         // dd($data);
         session()->put('data', $data);
@@ -68,9 +77,10 @@ class ViaController extends Controller
             Via::create($info); // Sử dụng create() để thêm dữ liệu
         });
         session()->flush();
-        $data = Via::orderBy('id', 'desc')->take(50)->get();
+        // $data = Via::orderBy('id', 'desc')->take(50)->get();
+        return redirect()->route('home');
 
-        return view('via.index',compact('data'));
+        // return view('via.index',compact('data'));
     }
 
 

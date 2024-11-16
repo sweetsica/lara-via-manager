@@ -43,11 +43,11 @@
             <form action="{{ route('file.upload.txt') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="container row">
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-6">
                         <label for="fileUpload">Tải file</label>
                         <input type="file" class="form-control-file" id="fileUpload" name="file" required>
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-6">
                         <div class="form-group">
                             <label for="fileSelect">Chọn mẫu</label>
                             <select class="form-control" id="fileSelect" name="keys" required>
@@ -55,22 +55,28 @@
                                 <option value="1">'uid','name','pass','token','email'</option>
                                 <option value="2">'uid','pass','2fa','cookies','email'</option>
                                 <option value="3">'uid','pass','cookies'</option>
+                                <option value="6">'uid','pass'</option>
+                                <option value="5">'uid','pass','2fa','email','cookies'</option>
                                 <option value="4">'uid','pass','2fa','birthday','email','email_password','cookies'</option>
                                 <!-- Thêm các tùy chọn file khác nếu cần -->
                             </select>
                         </div>
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-4">
                         <label for="fileUpload">Tên nguồn</label>
                         <input type="text" class="form-control-file" id="source_name" name="source_name" required>
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-4">
                         <label for="fileUpload">Link nguồn</label>
                         <input type="text" class="form-control-file" id="source_link" name="source_link" required>
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-4">
                         <label for="fileUpload">Giá</label>
                         <input type="text" class="form-control-file" id="price" name="price" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="fileUpload">Mã đơn hàng</label>
+                        <input type="text" class="form-control-file" id="order_code" name="order_code" required>
                     </div>
                 </div>
                 <div class="container mt-5">
@@ -137,6 +143,8 @@
                             <th scope="col" onclick="sortTable(3)">Token</th>
                             <th scope="col" onclick="sortTable(4)">Cookie</th>
                             <th scope="col" onclick="sortTable(5)">Email</th>
+                            <th scope="col" onclick="sortTable(6)">Nguồn</th>
+                            <th scope="col" onclick="sortTable(7)">Giá</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -156,6 +164,8 @@
                                     <td class="truncate">{{ $info['token'] ?? ''}}</td>
                                     <td class="truncate">{{ $info['cookie'] ?? ''}}</td>
                                     <td class="truncate">{{ $info['email'] ?? ''}}</td>
+                                    <td class="truncate">{{ $info['source_name'] ?? ''}}</td>
+                                    <td class="truncate">{{ $info['price'] ?? ''}}</td>
                                 </tr>
                             @endforeach
                         @else
